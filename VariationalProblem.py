@@ -9,7 +9,7 @@ import numpy as np
 
 
 class VariationalProblem(PDENLPModel):
-	def __init__(self, mesh, deg, f, h=None,target=Constant(0.0),penalty=False,bc=None, **kwargs) : 
+  def __init__(self, mesh, deg, f, h=None,target=Constant(0.0),penalty=False,bc=None, **kwargs) : 
 		
 		U = FunctionSpace(mesh, "Lagrange", deg)
 		self.target=target
@@ -28,7 +28,7 @@ class VariationalProblem(PDENLPModel):
 
 	
 
-    	def register_objective_functional(self,f,penalty):
+  def register_objective_functional(self,f,penalty):
 		u = self.u
 		#class accepts functionals declared as strings or functions
 		if type(f) is str:
@@ -49,7 +49,7 @@ class VariationalProblem(PDENLPModel):
     				self._objective_functional = f(u)
 	
 
-    	def register_constraint_functional(self,h) :
+  def register_constraint_functional(self,h) :
        		u = self.u
 		if type(h) is str:
 	       		self._constraint_functional = eval(h)

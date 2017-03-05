@@ -1,10 +1,7 @@
 from VariationalProblem import VariationalProblem
-#from ipoptproblem import IpoptProblem
 from dolfin import *
-from nlpmodel import NLPModel
-from pdemodel import PDENLPModel
 import numpy as np
-from newton import newton, newton_optim, armijo
+from newton import newton, newton_optim
 
 nvertices=200 #number of vertices
 deg=1 #degree of Lagrange polynomial

@@ -9,7 +9,7 @@ from newton import newton, newton_optim, armijo
 # ---------- The crossing river boat -----------
 # Define the function to be integrated
 def f(u) : 
-    v = Expression("-x[0]*x[0] + x[0]")
+    v = Expression("-x[0]*x[0] + x[0]",degree=1)
     c = 1.0 # boat velocity, considered to be constant
     f = ( ( (c**2.0 * (1.0 + inner(grad(u),grad(u))) - v**2.0)**(0.5) - v*inner(grad(u),grad(u))**0.5 ) / ( c**0.5 - v**0.5) )*dx
     return f
