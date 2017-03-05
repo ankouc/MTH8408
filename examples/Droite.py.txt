@@ -1,0 +1,22 @@
+from variationalproblem import VariationalProblem
+from dolfin import UnitSquare, UnitInterval, FunctionSpace, grad, \
+                   DirichletBC, Expression, inner, dx, Constant, plot, ds, \
+                   Function, DOLFIN_EPS, TestFunction
+from nlpmodel import NLPModel
+from pdemodel import PDENLPModel
+from newton import newton, newton_optim, armijo
+import numpy as np
+
+N=10 #number of vertices
+mesh = UnitInterval(N) 
+deg = 1 #degree of Lagrange polynomial
+f='(1 + inner(grad(u),grad(u)))**(0.5) * dx' # functional
+penalty=True #apply penalty to functional
+h=None # no constraints
+target=Expression("x[0]") #u_0 function for border conditions
+bc = 'DirichletBC(U, self.target, lambda x, on_boundary: on_boundary)' #Dirichlet boundary conditions
+
+droite=VariationalProblem(mesh, deg, f, h,target,penalty,bc) 
+
+newton_optim(droite)
+plot(droite.u, interactive=True)

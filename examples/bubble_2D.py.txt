@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+"""2D bubble problem: minimize area of the upper half of a bubble subject to a given volume.
+In this case the volume is of a half-sphere of diameter 1"""
+
+from variationalproblem import VariationalProblem
+from ipoptproblem import IpoptProblem
+from dolfin import UnitSquareMesh, UnitIntervalMesh, FunctionSpace, grad, \
+                   DirichletBC, Expression, inner, dx, Constant, plot, ds, \
+                   Function, DOLFIN_EPS, TestFunction
+from nlpmodel import NLPModel
+from pdemodel import PDENLPModel
+import numpy as np
+import ipopt
+import scipy.sparse as sps
+
+# Number of vertices => Number of intervals = N-1
+NX=10
+NY=10
+# function space degree
+deg=1
+mesh = UnitSquareMesh(NX-1, NY-1)
+target = Constant(0.0)
+bc = 'DirichletBC(U, self.target, lambda x, on_boundary: on_boundary )'
+# declare functional: minimize surface of 2D curve (in this case surface of upper half-circle)
+f = '( 1+inner(grad(u),grad(u)) )**(0.5)*dx'
+#declare constraint: subject to given volume under curve surface (volume of half-sphere)
+h = 'u*dx'
+# functional without penalty function
+penalty=False
+
+#instantiate problem
+bubble2D=VariationalProblem(mesh, deg, f, h,target,penalty,bc)
+
+#initial values
+x0=bubble2D.x0
+
+#lower boundary of x variable on mesh is 0
+lb = np.ones((NX*NY), dtype=np.float_)* (0.0)
+#no upper boundary
+ub = None  
+
+#upper and lower constraint set to volume of half-sphere of diameter 1 (=pi/48)
+cl = [0.2618]
+cu = [0.2618]
+
+bubble2D_solver = ipopt.problem(
+            n=len(x0),
+            m=len(cl),
+            problem_obj=IpoptProblem(bubble2D),
+            lb=lb,
+            ub=ub,
+            cl=cl,
+            cu=cu
+            )
+
+bubble2D_solver.addOption(b"mu_strategy", b"adaptive")
+bubble2D_solver.addOption(b"tol", 1e-10)
+#bubble2D_solver.addOption(b"max_iter", 100000)
+
+x, info = bubble2D_solver.solve(x0)
+
+print("Solution of the primal variables: x=%s\n" % repr(x))
+
+print("Solution of the dual variables: lambda=%s\n" % repr(info['mult_g']))
+
+print("Objective=%s\n" % repr(info['obj_val']))
+
+plot(bubble2D.u, interactive=True)
+
